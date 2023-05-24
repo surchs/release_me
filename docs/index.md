@@ -2,6 +2,9 @@
 
 For full documentation visit [mkdocs.org](https://www.mkdocs.org).
 
+Hello, I can also edit things.
+How nice. Please review
+
 ## Commands
 
 * `mkdocs new [dir-name]` - Create a new project.
