@@ -1,0 +1,28 @@
+name: Apply Label to every Pull Requests
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+
+jobs:
+  apply_label:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Apply Label
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+            bot=$(gh pr view https://github.com/neurobagel/bulk_annotations/pull/27 --json author -q '.author.is_bot')
+            if bot;
+            then
+              gh pr edit ${{ github.event.pull_request.number }} --add-label "Bot"
+            else
+              echo "oh, this was done by a human. How quaint"
+            fi
