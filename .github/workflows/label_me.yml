@@ -20,7 +20,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pr_author=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }} --json author -q '.author.login')
-          repo_owner=$(gh repo view ${{ github.repository }} --json owner.login -q '.owner.login')
+          repo_owner=$(gh repo view ${{ github.repository }} --json owner -q '.owner.login')
 
           # Check if the user is a maintainer
           is_maintainer=$(gh api -X GET /repos/${{ github.repository }} -f per_page=100 -f page=1 --json '[.permissions.admin]' -q ".[] | .[\"${pr_author}\"]")
