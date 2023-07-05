@@ -3,7 +3,9 @@ name: Apply Label to External Pull Requests
 on:
   pull_request:
     types:
-      - opened, edited
+      - opened
+      - edited
+      - synchronize
 
 jobs:
   apply_label:
@@ -17,17 +19,14 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          pr_author=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }} --json user.login -q '.user.login')
-          repo_owner=$(gh repo view ${{ github.repository }} --json owner.login -q '.owner.login')
+          pr_author=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }} --json author -q '.author.login')
+          author_permission=$(gh api /repos/${{ github.repository }}/${pr_author}/permission -t {{.permission}})
 
-          # Check if the user is a maintainer
-          is_maintainer=$(gh api -X GET /repos/${{ github.repository }} -f per_page=100 -f page=1 --json '[.permissions.admin]' -q ".[] | .[\"${pr_author}\"]")
-
-          # If the user is not a maintainer, apply the label
-          if [[ $is_maintainer == "null" ]]; then
+          # If the user can write or is an admin, apply no label
+          if [[ $author_permission == "write" || $author_permission == "admin" ]]; then
             echo "Adding 'External' label to the pull request."
-            gh pr label ${{ github.event.pull_request.number }} add "External"
+            gh pr edit ${{ github.event.pull_request.number }} --add-label "External"
           else
             echo "The pull request is opened by a maintainer. No label will be applied."
-            gh pr label ${{ github.event.pull_request.number }} add "Internal"
+            gh pr edit ${{ github.event.pull_request.number }} --add-label "Internal"
           fi
