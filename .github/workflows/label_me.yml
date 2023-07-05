@@ -20,7 +20,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pr_author=$(gh pr view https://github.com/${{ github.repository }}/pull/${{ github.event.pull_request.number }} --json author -q '.author.login')
-          author_permission$(gh api /repos/${{ github.repository }}/${pr_author}/permission -t {{.permission}})
+          author_permission=$(gh api /repos/${{ github.repository }}/${pr_author}/permission -t {{.permission}})
 
           # If the user can write or is an admin, apply no label
           if [[ $author_permission == "write" || $author_permission == "admin" ]]; then
